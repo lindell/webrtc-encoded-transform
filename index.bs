@@ -89,8 +89,8 @@ It uses an additional API on {{RTCRtpSender}} and {{RTCRtpReceiver}} to
 insert the processing into the pipeline.
 
 <pre class="idl">
-typedef (RTCRtpSFrameEncrypter or RTCRtpScriptTransform) RTCRtpSenderTransform;
-typedef (RTCRtpSFrameDecrypter or RTCRtpScriptTransform) RTCRtpReceiverTransform;
+typedef (RTCRtpSFrameEncryptor or RTCRtpScriptTransform) RTCRtpSenderTransform;
+typedef (RTCRtpSFrameDecryptor or RTCRtpScriptTransform) RTCRtpReceiverTransform;
 
 // New methods for RTCRtpSender and RTCRtpReceiver
 partial interface RTCRtpSender {
@@ -261,48 +261,48 @@ enum SFrameType {
     "per-packet"
 };
 
-dictionary RTCRtpSFrameEncrypterOptions : SFrameTransformOptions {
+dictionary RTCRtpSFrameEncryptorOptions : SFrameTransformOptions {
     SFrameType type = "per-frame";
 };
 
 typedef [EnforceRange] unsigned long long SmallCryptoKeyID;
 typedef (SmallCryptoKeyID or bigint) CryptoKeyID;
 
-interface mixin SFrameEncrypterManager {
+interface mixin SFrameEncryptorManager {
     Promise<undefined> setEncryptionKey(CryptoKey key, CryptoKeyID keyId);
 };
 
-interface mixin SFrameDecrypterManager {
+interface mixin SFrameDecryptorManager {
     Promise<undefined> addDecryptionKey(CryptoKey key, CryptoKeyID keyId);
     Promise<undefined> removeDecryptionKey(CryptoKeyID keyId);
     attribute EventHandler onerror;
 };
 
 [Exposed=Window]
-interface RTCRtpSFrameEncrypter {
-    constructor(RTCRtpSFrameEncrypterOptions options);
+interface RTCRtpSFrameEncryptor {
+    constructor(RTCRtpSFrameEncryptorOptions options);
 };
-RTCRtpSFrameEncrypter includes SFrameEncrypterManager;
+RTCRtpSFrameEncryptor includes SFrameEncryptorManager;
 
 [Exposed=Window]
-interface RTCRtpSFrameDecrypter : EventTarget {
+interface RTCRtpSFrameDecryptor : EventTarget {
     constructor(SFrameTransformOptions options);
 };
-RTCRtpSFrameDecrypter includes SFrameDecrypterManager;
+RTCRtpSFrameDecryptor includes SFrameDecryptorManager;
 
 [Exposed=(Window,DedicatedWorker)]
-interface SFrameEncrypterStream {
+interface SFrameEncryptorStream {
     constructor(SFrameTransformOptions options);
 };
-SFrameEncrypterStream includes GenericTransformStream;
-SFrameEncrypterStream includes SFrameEncrypterManager;
+SFrameEncryptorStream includes GenericTransformStream;
+SFrameEncryptorStream includes SFrameEncryptorManager;
 
 [Exposed=(Window,DedicatedWorker)]
-interface SFrameDecrypterStream : EventTarget {
+interface SFrameDecryptorStream : EventTarget {
     constructor(SFrameTransformOptions options);
 };
-SFrameDecrypterStream includes GenericTransformStream;
-SFrameDecrypterStream includes SFrameDecrypterManager;
+SFrameDecryptorStream includes GenericTransformStream;
+SFrameDecryptorStream includes SFrameDecryptorManager;
 
 enum SFrameTransformErrorEventType {
     "authentication",
@@ -326,24 +326,24 @@ dictionary SFrameTransformErrorEventInit : EventInit {
 };
 </xmp>
 
-The <dfn constructor for="RTCRtpSFrameEncrypter" lt="RTCRtpSFrameEncrypter(options)"><code>new RTCRtpSFrameEncrypter(<var>options</var>)</code></dfn> constructor steps are:
+The <dfn constructor for="RTCRtpSFrameEncryptor" lt="RTCRtpSFrameEncryptor(options)"><code>new RTCRtpSFrameEncryptor(<var>options</var>)</code></dfn> constructor steps are:
 1. Let |options| be the method's first argument.
 1. Run the [=SFrame initialization algorithm=] with |this| and |options|.
 1. Set |this|.`[[role]]` to 'encrypt'.
 1. Set |this|.`[[useSFrame]]` to true.
 
-The <dfn constructor for="RTCRtpSFrameDecrypter" lt="RTCRtpSFrameDecrypter(options)"><code>new RTCRtpSFrameDecrypter(<var>options</var>)</code></dfn> constructor steps are:
+The <dfn constructor for="RTCRtpSFrameDecryptor" lt="RTCRtpSFrameDecryptor(options)"><code>new RTCRtpSFrameDecryptor(<var>options</var>)</code></dfn> constructor steps are:
 1. Let |options| be the method's first argument.
 1. Run the [=SFrame initialization algorithm=] with |this| and |options|.
 1. Set |this|.`[[role]]` to 'decrypt'.
 1. Set |this|.`[[useSFrame]]` to true.
 
-The <dfn constructor for="SFrameEncrypterStream" lt="SFrameEncrypterStream(options)"><code>new SFrameEncrypterStream(<var>options</var>)</code></dfn> constructor steps are:
+The <dfn constructor for="SFrameEncryptorStream" lt="SFrameEncryptorStream(options)"><code>new SFrameEncryptorStream(<var>options</var>)</code></dfn> constructor steps are:
 1. Let |options| be the method's first argument.
 1. Run the [=SFrame initialization algorithm=] with |this| and |options|.
 1. Set |this|.`[[role]]` to 'encrypt'.
 
-The <dfn constructor for="SFrameDecrypterStream" lt="SFrameDecrypterStream(options)"><code>new SFrameDecrypterStream(<var>options</var>)</code></dfn> constructor steps are:
+The <dfn constructor for="SFrameDecryptorStream" lt="SFrameDecryptorStream(options)"><code>new SFrameDecryptorStream(<var>options</var>)</code></dfn> constructor steps are:
 1. Let |options| be the method's first argument.
 1. Run the [=SFrame initialization algorithm=] with |this| and |options|.
 1. Set |this|.`[[role]]` to 'decrypt'.
@@ -352,8 +352,8 @@ The <dfn constructor for="SFrameDecrypterStream" lt="SFrameDecrypterStream(optio
 
 The <dfn>SFrame initialization algorithm</dfn>, given |this| and |options|, runs these steps:
 1. Let |transformAlgorithm| be an algorithm which takes a |frame| as input and runs the [=SFrame transform algorithm=] with |this| and |frame|.
-1. If |options|["{{RTCRtpSFrameEncrypterOptions/type}}"] is [=map/exists|present=], run these steps:
-    1. If |options|["{{RTCRtpSFrameEncrypterOptions/type}}"] is 'per-frame', use per-frame sending as defined in [[RTP-SFRAME-PAYLOAD]].
+1. If |options|["{{RTCRtpSFrameEncryptorOptions/type}}"] is [=map/exists|present=], run these steps:
+    1. If |options|["{{RTCRtpSFrameEncryptorOptions/type}}"] is 'per-frame', use per-frame sending as defined in [[RTP-SFRAME-PAYLOAD]].
     1. Otherwise, use per-packet sending as defined in [[RTP-SFRAME-PAYLOAD]].
 1. Set |this|.`[[transform]]` to a new {{TransformStream}}.
 1. <a dfn for="ReadableStream">Set up</a> [=this=].`[[transform]]` with [=TransformStream/set up/transformAlgorithm=] set to |transformAlgorithm|.
@@ -372,13 +372,13 @@ The <dfn>SFrame transform algorithm</dfn>, given |this| and |frame|, runs these 
 1. If |data| is undefined, abort these steps.
 1. Let |buffer| be the result of running the SFrame algorithm with |data|, |this|.`[[cipherSuite]]`, and |role| as parameters. This algorithm is defined by [[RFC9605]] and returns an {{ArrayBuffer}}.
 1. If the SFrame algorithm exits abruptly with an error, [=queue a task=] to run the following sub steps:
-     1. If the processing fails on decryption side due to |data| not following the SFrame format, [=fire an event=] named {{SFrameDecrypterManager/onerror|error}} at |this|,
+     1. If the processing fails on decryption side due to |data| not following the SFrame format, [=fire an event=] named {{SFrameDecryptorManager/onerror|error}} at |this|,
         using the {{SFrameTransformErrorEvent}} interface with its {{SFrameTransformErrorEvent/errorType}} attribute set to {{SFrameTransformErrorEventType/syntax}}
         and its {{SFrameTransformErrorEvent/frame}} attribute set to |frame|.
-     1. If the processing fails on decryption side due to the key identifier parsed in |data| being unknown, [=fire an event=] named {{SFrameDecrypterManager/onerror|error}} at |this|,
+     1. If the processing fails on decryption side due to the key identifier parsed in |data| being unknown, [=fire an event=] named {{SFrameDecryptorManager/onerror|error}} at |this|,
         using the {{SFrameTransformErrorEvent}} interface with its {{SFrameTransformErrorEvent/errorType}} attribute set to {{SFrameTransformErrorEventType/keyID}},
         its {{SFrameTransformErrorEvent/frame}} attribute set to |frame| and its {{SFrameTransformErrorEvent/keyID}} attribute set to the keyID value parsed in the SFrame header.
-     1. If the processing fails on decryption side due to validation of the authentication tag, [=fire an event=] named {{SFrameDecrypterManager/onerror|error}} at |this|,
+     1. If the processing fails on decryption side due to validation of the authentication tag, [=fire an event=] named {{SFrameDecryptorManager/onerror|error}} at |this|,
         using the {{SFrameTransformErrorEvent}} interface with its {{SFrameTransformErrorEvent/errorType}} attribute set to {{SFrameTransformErrorEventType/authentication}}
         and its {{SFrameTransformErrorEvent/frame}} attribute set to |frame|.
      1. Abort these steps.
@@ -388,7 +388,7 @@ The <dfn>SFrame transform algorithm</dfn>, given |this| and |frame|, runs these 
 1. [=ReadableStream/Enqueue=] |frame| in |this|.`[[transform]]`.
 
 ## Methods ## {#sframe-transform-methods}
-The <dfn method for="SFrameEncrypterManager">setEncryptionKey(|key|, |keyId|)</dfn> method steps are:
+The <dfn method for="SFrameEncryptorManager">setEncryptionKey(|key|, |keyId|)</dfn> method steps are:
 1. Let |promise| be [=a new promise=].
 1. If |keyId| is a {{bigint}} which cannot be represented as a integer between 0 and 2<sup>64</sup>-1 inclusive, [=reject=] |promise| with a {{RangeError}} exception and abort these steps.
 1. [=In parallel=], run the following steps:
@@ -397,7 +397,7 @@ The <dfn method for="SFrameEncrypterManager">setEncryptionKey(|key|, |keyId|)</d
     1. [=Queue a task=] to [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
-The <dfn method for="SFrameDecrypterManager">addDecryptionKey(|key|, |keyId|)</dfn> method steps are:
+The <dfn method for="SFrameDecryptorManager">addDecryptionKey(|key|, |keyId|)</dfn> method steps are:
 1. Let |promise| be [=a new promise=].
 1. If |keyId| is a {{bigint}} which cannot be represented as a integer between 0 and 2<sup>64</sup>-1 inclusive, [=reject=] |promise| with a {{RangeError}} exception, and abort these steps.
 1. [=In parallel=], run the following steps:
@@ -407,7 +407,7 @@ The <dfn method for="SFrameDecrypterManager">addDecryptionKey(|key|, |keyId|)</d
     1. [=Queue a task=] to [=resolve=] |promise| with undefined.
 1. Return |promise|.
 
-The <dfn method for="SFrameDecrypterManager">removeDecryptionKey(|keyId|)</dfn> method steps are:
+The <dfn method for="SFrameDecryptorManager">removeDecryptionKey(|keyId|)</dfn> method steps are:
 1. Let |promise| be [=a new promise=].
 1. If |keyId| is a {{bigint}} which cannot be represented as a integer between 0 and 2<sup>64</sup>-1 inclusive, [=reject=] |promise| with a {{RangeError}} exception, and abort these steps.
 1. [=In parallel=], run the following steps:
