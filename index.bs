@@ -940,13 +940,14 @@ interface RTCEncodedAudioFrame {
             1. Set this.`[[contentType]]` to |init|["{{RTCEncodedAudioFrameInit/contentType}}"].
             1. Set this.`[[rtpTimestampWithoutOffset]]` to |init|["{{RTCEncodedAudioFrameInit/rtpTimestampWithoutOffset}}"].
             1. Set this.`[[owner]]` to null.
-            1. Let `[[metadata]]` represent the metadata associated with this newly constructed frame.
-                1. Set `[[metadata]]`["{{RTCEncodedAudioFrameMetadata/sequenceNumber}}"] to undefined.
-                1. Set `[[metadata]]`["{{RTCEncodedFrameMetadata/payloadType}}"] to |init|["{{RTCEncodedAudioFrameInit/payloadType}}"].
-                1. Set `[[metadata]]`["{{RTCEncodedFrameMetadata/contributingSources}}"] to a copy of |init|["{{RTCEncodedAudioFrameInit/contributingSources}}"].
-                1. If |init|["{{RTCEncodedAudioFrameInit/captureTime}}"] is [=map/exists|present=], set `[[metadata]]`["{{RTCEncodedFrameMetadata/captureTime}}"] to |init|["{{RTCEncodedAudioFrameInit/captureTime}}"] shifted to the capture system's clock.
-                1. If |init|["{{RTCEncodedAudioFrameInit/mimeType}}"] is [=map/exists|present=], set `[[metadata]]`["{{RTCEncodedFrameMetadata/mimeType}}"] to |init|["{{RTCEncodedAudioFrameInit/mimeType}}"].
-                1. If |init|["{{RTCEncodedAudioFrameInit/audioLevel}}"] is [=map/exists|present=], set `[[metadata]]`["{{RTCEncodedAudioFrameMetadata/audioLevel}}"] to |init|["{{RTCEncodedAudioFrameInit/audioLevel}}"].
+            1. Let |m| be a [=map=].
+                1. Set |m|["{{RTCEncodedAudioFrameMetadata/sequenceNumber}}"] to undefined.
+                1. Set |m|["{{RTCEncodedFrameMetadata/payloadType}}"] to |init|["{{RTCEncodedAudioFrameInit/payloadType}}"].
+                1. Set |m|["{{RTCEncodedFrameMetadata/contributingSources}}"] to a copy of |init|["{{RTCEncodedAudioFrameInit/contributingSources}}"].
+                1. If |init|["{{RTCEncodedAudioFrameInit/captureTime}}"] is [=map/exists|present=], set |m|["{{RTCEncodedFrameMetadata/captureTime}}"] to |init|["{{RTCEncodedAudioFrameInit/captureTime}}"] shifted to the capture system's clock.
+                1. If |init|["{{RTCEncodedAudioFrameInit/mimeType}}"] is [=map/exists|present=], set |m|["{{RTCEncodedFrameMetadata/mimeType}}"] to |init|["{{RTCEncodedAudioFrameInit/mimeType}}"].
+                1. If |init|["{{RTCEncodedAudioFrameInit/audioLevel}}"] is [=map/exists|present=], set |m|["{{RTCEncodedAudioFrameMetadata/audioLevel}}"] to |init|["{{RTCEncodedAudioFrameInit/audioLevel}}"].
+            1. Set this.`[[metadata]]` to |m|.
         </p>
         <p class="note">
             Before packetization, <code>rtpTimestamp</code> is absent in metadata because the frame is not yet associated with an active SSRC or packetizer. When the frame is subsequently enqueued and processed by an {{RTCRtpSender}}'s packetizer, the final RTP header timestamp is computed by adding the sender's SSRC-specific random offset to `[[rtpTimestampWithoutOffset]]` per [[RFC3550]].
